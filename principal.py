@@ -1,5 +1,7 @@
 from flask import Flask, render_template_string
 import urllib.parse
+import csv
+import requests
 
 app = Flask(__name__)
 
@@ -7,25 +9,38 @@ app = Flask(__name__)
 NUMERO_WHATSAPP = "5515991323719"  
 NOME_LOJA = "Multi Eletronic"
 
-# Lista de produtos com os seus links reais do Postimages e dados atualizados
-PRODUTOS = [
-    {
-        "id": 1,
-        "nome": "🔊 Caixa de Som Bluetooth",
-        "preco": "R$ 79,90",
-        "imagem": "https://i.postimg.cc/R0vT9dyJ/caixa-de-son-Bluetooth.webp",
-        "descricao": "Som potente, alta fidelidade, bateria de longa duração e resistente à água."
-    },
-    {
-        "id": 2,
-        "nome": "⌨️ Teclado Gamer Retroiluminado",
-        "preco": "R$ 119,90",
-        "imagem": "https://i.postimg.cc/SKWNL7x7/Teclado-Gamer.webp",
-        "descricao": "Teclas macias, resposta rápida e iluminação LED RGB perfeita para jogar à noite."
-    }
-]
+# ID da sua planilha do Google corrigido
+PLANILHA_ID = "1-c0DcrOkeEjV3h9Tf5Nv6QUk9fnWuc9esmeguvkenqs"
+LINK_EXPORTACAO_CSV = f"https://google.com{PLANILHA_ID}/export?format=csv"
 
-# Modelo visual atualizado para mostrar as fotos grandes e bonitas
+def buscar_produtos_da_planilha():
+    produtos = []
+    try:
+        # Baixa os dados atualizados da sua planilha em formato de texto (CSV)
+        resposta = requests.get(LINK_EXPORTACAO_CSV)
+        resposta.encoding = 'utf-8'
+        
+        # Lê linha por linha da tabela
+        linhas = csv.DictReader(resposta.text.splitlines())
+        for linha in linhas:
+            # Organiza os dados para o site entender, usando os nomes exatos das colunas
+            produtos.append({
+                "id": linha.get("id"),
+                "nome": linha.get("nome"),
+                "preco": linha.get("preco"),
+                "imagem": linha.get("imagem"),
+                "descricao": linha.get("descricao")
+            })
+    except Exception as e:
+        print(f"Erro ao ler planilha: {e}")
+        # Caso a planilha falhe, exibe um produto de segurança
+        produtos = [{
+            "id": "1", "nome": "Erro ao carregar", "preco": "R$ 0,00", "imagem": "", 
+            "descricao": "Verifique o compartilhamento da planilha."
+        }]
+    return produtos
+
+# Modelo visual ajustado para carregar as fotos e dados da planilha
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -54,7 +69,9 @@ HTML_TEMPLATE = """
     <div class="container">
         {% for p in produtos %}
         <div class="card">
+            {% if p.imagem %}
             <img src="{{ p.imagem }}" alt="{{ p.nome }}">
+            {% endif %}
             <h3>{{ p.nome }}</h3>
             <p>{{ p.descricao }}</p>
             <div class="price">{{ p.preco }}</div>
@@ -68,12 +85,16 @@ HTML_TEMPLATE = """
 
 @app.route('/')
 def home():
+    # Busca a lista atualizada direto da sua planilha
+    lista_produtos = buscar_produtos_da_planilha()
+    
     mensagens = {}
-    for p in PRODUTOS:
+    for p in lista_produtos:
         texto = f"Olá! Vi no site da {NOME_LOJA} e quero comprar o produto: {p['nome']} no valor de {p['preco']}."
         mensagens[p['id']] = urllib.parse.quote(texto)
         
-    return render_template_string(HTML_TEMPLATE, produtos=PRODUTOS, nome_loja=NOME_LOJA, numero_whatsapp=NUMERO_WHATSAPP, mensagens=mensagens)
+    return render_template_string(HTML_TEMPLATE, produtos=lista_produtos, nome_loja=NOME_LOJA, numero_whatsapp=NUMERO_WHATSAPP, mensagens=mensagens)
 
 if __name__ == '__main__':
     app.run(debug=True)
+
