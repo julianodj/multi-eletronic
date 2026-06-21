@@ -22,7 +22,7 @@ def buscar_produtos_da_planilha():
         for linha in linhas:
             produtos.append({
                 "id": linha.get("id"),
-                "nome": lambda_nome := linha.get("nome", "Produto"),
+                "nome": linha.get("nome", "Produto"),
                 "preco": linha.get("preco", "R$ 0,00"),
                 "imagem": linha.get("imagem", ""),
                 "descricao": linha.get("descricao", "Sem descrição disponível.")
@@ -62,7 +62,7 @@ HTML_TEMPLATE = """
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: var(--light); color: #333; }
         
         /* Faixa de Benefícios no Topo */
-        .top-bar { background: var(--secondary); color: white; padding: 8px; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .top-bar { background: var(--secondary); color: white; padding: 8px; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
         
         /* Cabeçalho */
         header { background: var(--dark); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary); padding-left: 10%; padding-right: 10%; }
@@ -71,7 +71,7 @@ HTML_TEMPLATE = """
         .cart-icon { position: relative; font-size: 24px; cursor: pointer; background: none; border: none; color: white; }
         .cart-count { position: absolute; top: -8px; right: -10px; background: var(--secondary); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         
-        h1 { color: var(--dark); margin-top: 40px; font-size: 28px; }
+        h1 { color: var(--dark); margin-top: 40px; font-size: 28px; text-align: center; }
         
         /* Container de Produtos */
         .container { display: flex; justify-content: center; flex-wrap: wrap; padding: 20px; gap: 30px; }
@@ -114,7 +114,7 @@ HTML_TEMPLATE = """
 
     <!-- Cabeçalho com Sacola de Compras -->
     <header>
-        <div class="logo">{{ nome_loja.split()[0] }}<span>{{ nome_loja.split()[1] if nome_loja.split()|length > 1 else '' }}</span></div>
+        <div class="logo">Multi <span>Eletronic</span></div>
         <button class="cart-icon" onclick="toggleCart()">
             🛍️ <div class="cart-count" id="cart-count">0</div>
         </button>
@@ -163,11 +163,10 @@ HTML_TEMPLATE = """
         <button class="btn-checkout" onclick="checkoutWhatsApp()">Finalizar Compra</button>
     </div>
 
-    <!-- Motor JavaScript Inteligente do Carrinho -->
+    <!-- Motor JavaScript do Carrinho -->
     <script>
         let carrinho = [];
 
-        // Função para alternar as abas de Descrição / Envio
         function switchTab(event, tabId) {
             let card = event.target.closest('.card');
             card.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -177,12 +176,18 @@ HTML_TEMPLATE = """
             card.querySelector('#' + tabId).classList.add('active');
         }
 
-        // Abrir/Fechar Janela Lateral da Sacola
         function toggleCart() {
             document.getElementById('cart-modal').classList.toggle('open');
         }
 
-        // Adicionar itens na sacola
         function addToCart(id, nome, preco) {
             carrinho.push({ id, nome, preco });
             atualizarInterfaceCarrinho();
+            document.getElementById('cart-modal').classList.add('open');
+        }
+
+        function removeFromCart(index) {
+            carrinho.splice(index, 1);
+            atualizarInterfaceCarrinho();
+        }
+
