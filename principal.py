@@ -8,7 +8,7 @@ app = Flask(__name__)
 NUMERO_WHATSAPP = "5515991323719"  
 NOME_LOJA = "Multi Eletronic"
 PLANILHA_ID = "1-c0DcrOkEJf3v9hTfSNv6QUk9fnWuc9esmeguvkenqs"
-LINK_EXPORTACAO_CSV = f"https://google.com{PLANILHA_ID}/export?format=csv"
+LINK_EXPORTACAO_CSV = f"https://google.com{PLANILHA_ID}/export?format=csv
 
 def buscar_produtos():
     produtos = []
