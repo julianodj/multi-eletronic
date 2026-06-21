@@ -170,4 +170,3 @@ HTML_TEMPLATE = """
                     </div>
                 `;
             });
-
