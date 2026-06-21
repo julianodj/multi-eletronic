@@ -10,7 +10,7 @@ NUMERO_WHATSAPP = "5515991323719"
 NOME_LOJA = "Multi Eletronic"
 
 # ID da sua planilha do Google corrigido
-PLANILHA_ID = "1-c0DcrOkeEjV3h9Tf5Nv6QUk9fnWuc9esmeguvkenqs"
+PLANILHA_ID = "1-cb0erDkklfH9ihtf5Nv6SjUk9mwkUc9esmeguvkenqs"
 LINK_EXPORTACAO_CSV = f"https://google.com{PLANILHA_ID}/export?format=csv"
 
 def buscar_produtos_da_planilha():
@@ -97,4 +97,3 @@ def home():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
